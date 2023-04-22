@@ -5,7 +5,75 @@ var OSRM = require('osrm')
 //var osrmDecode = require("osrm-geojson");
 var turf = require('@turf/turf');
 var format = require('pg-format');
-app.listen(3000);
+app.listen(5000);
+
+const {Client } = require('pg');
+//const res = require('express/lib/response');
+const client = new Client()
+const pool = new Client({
+  host: "localhost",
+  port: 5432,
+  user:"postgres",
+  password: "1234aeiou",
+  database: "routing"  
+})
+app.use(express.json());
+pool.connect();
+const cors = require('cors');
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 // For legacy browser support
+}
+
+app.use(cors(corsOptions));
+//var GeoJSON = require('geojson');
+const { json } = require('express/lib/response');
+
+
+// set order type
+app.post ("/orders", async (req,res) => {
+  try {
+    //const desc = req.body;
+    const {order_type} = req.body;
+    const update_prod_b = await pool.query ("insert into odrers (order_type) values ($1) returning order_type",[order_type]);
+    res.json(order_type);
+  }
+  catch 
+  {
+    console.log('error')
+  }
+});
+
+
+
+app.get ("/outlets", async (req,res) => {
+  try {
+    //res.send(desc.coordinates)
+    const outlets= await pool.query ("select name,outlets.id, x, y from outlets inner join odrers on outlets.name = odrers.order_type");
+    //var y = GeoJSON.parse(outlets.rows, {Point: ['y', 'x']});
+    res.json(outlets.rows);
+    //console.log(json(outlets))
+  }
+  catch 
+  {
+    console.log('error name')
+  }
+});
+// send selected outlets in from outlets database into orders table 
+app.get ("/outlets_table", async (req,res) => {
+  try {
+    const outlets= await pool.query ("select name,outlets.id, x, y from outlets inner join odrers on outlets.name = odrers.order_type");
+    var outlet_table = GeoJSON.parse(outlets.rows, {Point: ['y', 'x']});
+    var result = outlet_table.features.map(obj => {
+      return obj.properties
+    })
+    res.send(result);
+  }
+  catch 
+  {
+    console.log('error name')
+  }
+});
 
 //get request provides route in the form of a geojson file when given
 // a pair of ccoordinates 
@@ -119,3 +187,21 @@ app.get ("/bbx", async (req,res) => {
       console.log('error')
     }
   });
+
+//trial to display Geojson files in leaflet form SQL data
+app.get ("/", async (req, res, next) => {
+
+  try {
+
+    const qund = 'SELECT ST_AsGeoJSON(ST_SetSRID(ST_Point(38.9,9.001), 4326))'
+    const jjc = await pool.query(qund)
+    //console.log(jjc)
+    var x = jjc.rows[0].st_asgeojson
+
+    console.log (x)
+    res.send(x)
+} catch (error) {
+    console.log ("error")
+  }
+
+});
