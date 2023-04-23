@@ -1,1 +1,1 @@
-# Map_box_web_app
+This a web app part of our startups fleet mangment system. We have only uploaded two files; JS file that runs on Node whcih hadles Get and Post requests and another JS file that runs in React whcih is responsible for the front end part of the applicaiton. 
