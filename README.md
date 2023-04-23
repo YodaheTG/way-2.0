@@ -1,1 +1,1 @@
-This a web app part of our startups fleet mangment system. We have only uploaded two files; JS file that runs on Node whcih hadles Get and Post requests and another JS file that runs in React whcih is responsible for the front end part of the applicaiton. 
+This a web app part of our startup's route planning application (prototype stage). We have only uploaded two files; JS file that runs on Node whcih hadles Get and Post requests and another JS file that runs in React whcih is responsible for the front end part of the applicaiton. 
