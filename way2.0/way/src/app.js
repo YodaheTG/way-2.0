@@ -198,7 +198,7 @@ const onChangeHandler = (text) => {
 
   }, []);
   
-
+// handles serach bar requests 
   const _onEdited = (e) => {
     let numEdited = 0;
     e.layers.eachLayer((layer) => {
@@ -264,6 +264,7 @@ const onChangeHandler = (text) => {
     }
     
   }
+  //sample Geo-json data to test the rendering process 
   var test_gjj = {
     "type": "FeatureCollection",
     "features": [
@@ -301,12 +302,7 @@ const onChangeHandler = (text) => {
   }
   var test = Object.values(test_gjj)
 
-  const position = test_gjj.features.map(({ properties }) => { return properties })
-  const position2 = position.map(({ id }) => { return id })
-  const position3 = [[51.505, -0.09], [51.505, -0.09]]
-  const positon4 = position2.map((id) => id.toString())
-  var i;
-  let people = []
+  //render numbred icons in a suceeding format to display them in a map frame. 
   if (testgj.length>0){
     for (i = 0; i<=testgj.length-1; i++ ){
       testgj[i].icon_name= "icons/number"+"_"+i.toString()+".png" 
