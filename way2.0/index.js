@@ -5,8 +5,21 @@ var OSRM = require('osrm')
 //var osrmDecode = require("osrm-geojson");
 var turf = require('@turf/turf');
 var format = require('pg-format');
-app.listen(3000);
-
+const cors = require('cors');
+app.use(cors())
+app.listen(5000);
+const {Client } = require('pg');
+//const res = require('express/lib/response');
+const client = new Client()
+const pool = new Client({
+  host: "localhost",
+  port: 5432,
+  user:"postgres",
+  password: "1234aeiou",
+  database: "routing"  
+})
+app.use(express.json());
+pool.connect();
 //get request provides route in the form of a geojson file when given
 // a pair of ccoordinates 
 
@@ -117,5 +130,88 @@ app.get ("/bbx", async (req,res) => {
     catch 
     {
       console.log('error')
+    }
+  });
+  app.get ("/", async (req, res) => {
+
+    try {
+  
+      //const qund = 'SELECT ST_AsGeoJSON(ST_SetSRID(ST_Point(38.9,9.001), 4326))'
+      //const jjc = await pool.query(qund)
+      //console.log(jjc)
+      //var x = jjc.rows[0].st_asgeojson
+
+      var geojsonFeature = {
+        "type": "Feature",
+        "properties": {
+            "name": "Coors Field",
+            "amenity": "Baseball Stadium",
+            "popupContent": "This is where the Rockies play!"
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [-104.99404, 39.75621]
+        }
+    };
+    var coords = [
+      {
+          "x": 38.733333,
+          "y": 9.022222
+      },
+      {
+          "x": 38.711111,
+          "y": 8.99999
+      },
+      {
+          "x": 38.69999,
+          "y": 9.00000
+      },
+      {
+          "x": 38.798888,
+          "y": 9.0000
+      },
+      {
+          "x": 38.72222,
+          "y": 9.05555
+      },
+      {
+          "x": 38.79999,
+          "y": 9.0000
+      }
+  ]
+      //console.log (jjc)
+      res.send(geojsonFeature.geometry)
+  } catch (error) {
+      console.log ("error")
+    }
+  
+  });
+  app.get ("/outlets", async (req,res) => {
+    try {
+      //res.send(desc.coordinates)
+      const outlets= await pool.query ("select name,outlets.id, x, y from outlets inner join odrers on outlets.name = odrers.order_type");
+      //const outlets = await pool.query("select * from outlets limit 1");
+      //var y = GeoJSON.parse(outlets.rows, {Point: ['y', 'x']});
+      res.json(outlets.rows);
+      //console.log(json(outlets))
+    }
+    catch 
+    {
+      console.log('error name')
+    }
+  });
+
+  app.get ("/outlets_table", async (req,res) => {
+    try {
+      const outlets= await pool.query ("select name,outlets.id, x, y from outlets inner join odrers on outlets.name = odrers.order_type");
+      var outlet_table = GeoJSON.parse(outlets.rows, {Point: ['y', 'x']});
+      var result = outlet_table.features.map(obj => {
+        return obj.properties
+      })
+      res.send(result);
+    }
+    catch 
+    {
+      console.log('error name')
     }
   });
